@@ -35,7 +35,7 @@ def install_cursors():
 
 def install_fonts():
     logger.info("Installing SF fonts.")
-    u.git_clone("https://github.com/blaisck/sfwin.git ", G["SOURCES_DIR"])
+    u.git_clone("https://github.com/blaisck/sfwin.git", G["SOURCES_DIR"])
 
     installed = 0
     sf_compact = Path("~/sources/sfwin/SFCompact").expanduser()

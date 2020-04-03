@@ -20,7 +20,10 @@ bash install.sh
 ```
 
 ## Screenshots
-Script Finished Installing:
+Before:
+![macify-linux-1.png](https://raw.githubusercontent.com/Jonchun/macify-linux/master/images/macify-linux-before.png)
+
+After Script Finished Installing:
 ![macify-linux-1.png](https://raw.githubusercontent.com/Jonchun/macify-linux/master/images/macify-linux-1.png)
 
 Global Menu:
