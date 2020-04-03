@@ -1,0 +1,3 @@
+import macifylinux
+
+macifylinux.run()
