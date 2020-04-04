@@ -134,8 +134,15 @@ def git_clone(repo_url, target_dir, flags=""):
         return repo_dir
     except subprocess.CalledProcessError as e:
         if e.returncode == 128:
-            logger.warning("%s already exists! Skipping clone...", repo_url)
-            # Should probably git pull instead in the future
+            logger.info("%s already exists! git pull instead...", repo_url)
+
+            commands = [
+                "cd {}".format(repo_dir),
+                "git pull",
+            ]
+            run_shell(
+                " && ".join(commands), stderr_level=logging.DEBUG,
+            )
             return repo_dir
         logger.error("git clone failed for %s.", repo_url)
         logger.debug("", exc_info=True)
