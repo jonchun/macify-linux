@@ -47,12 +47,12 @@ def run():
 
     modules = []
     modules.append(m.lookandfeel)
-    # modules.append(m.plasmoids)
-    # # albert should be installed after lookandfeel due to icons
-    # modules.append(m.albert)
-    # # lattedock should be installed AFTER plasmoids so that they will show up.
-    # modules.append(m.lattedock)
-    # modules.append((m.kinto, [], {"style": "light"}))
+    modules.append(m.plasmoids)
+    # albert should be installed after lookandfeel due to icons
+    modules.append(m.albert)
+    # lattedock should be installed AFTER plasmoids so that they will show up.
+    modules.append(m.lattedock)
+    modules.append((m.kinto, [], {"style": "light"}))
 
     for module in modules:
         args = []
