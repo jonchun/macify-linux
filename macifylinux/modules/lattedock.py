@@ -91,7 +91,7 @@ def start_latte():
     # execute it directly via Popen so that there are no open pipes when program exits.
     # subprocess.Popen("nohup latte-dock > /dev/null 2>&1 &", shell=True)
     try:
-        u.run_shell("gtk-launch org.kde.latte-dock.desktop")
+        u.run_shell("gtk-launch org.kde.latte-dock.desktop", stderr_level=logging.DEBUG)
     except CalledProcessError as e:
         logger.error("Problem while starting latte dock: %s", e)
         logger.debug("", exc_info=True)
