@@ -86,11 +86,16 @@ def install_icons():
 
 
 def install_login_screen():
-    # Login Screen
+    logger.info("Installing Login Screen.")
+
     kde_plasma_chili = u.git_clone(
         "https://github.com/MarianArlt/kde-plasma-chili.git", G["SOURCES_DIR"]
     )
-    u.cp(kde_plasma_chili, "/usr/share/sddm/themes/plasma-chili", flags='r', root=True)
+    theme_path = Path("/usr/share/sddm/themes/plasma-chili")
+    if theme_path.is_dir():
+        u.run_shell('rm -rf {}'. format(theme_path), root=True)
+
+    u.cp(kde_plasma_chili, theme_path, flags="r", root=True)
 
     with u.get_template("sddm/theme.conf.user").open() as f:
         sddm_theme_conf = f.read()
@@ -104,11 +109,15 @@ def install_login_screen():
     tmp_file = tempfile.NamedTemporaryFile("w", delete=False)
     tmp_file.write(sddm_theme_conf)
     tmp_file.close()
+    logger.debug("Wallpaper: %s", default_wallpaper)
     u.cp(default_wallpaper, "/usr/share/sddm/themes/plasma-chili", root=True)
     tmp_file_path = Path(tmp_file.name)
     tmp_file_path.chmod(0o664)
-    u.cp(tmp_file_path, "/usr/share/sddm/themes/plasma-chili/theme.conf.user", root=True)
+    u.cp(
+        tmp_file_path, "/usr/share/sddm/themes/plasma-chili/theme.conf.user", root=True
+    )
     tmp_file_path.unlink()
+
 
 def install_themes():
     logger.info("Installing KDE themes.")

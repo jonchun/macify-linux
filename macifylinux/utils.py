@@ -42,6 +42,7 @@ def change_wallpaper(wallpaper_file):
 
 
 def eval_plasma_script(script, is_file=True):
+    script_file = script
     # Takes a path object and executes the script
     if is_file:
         with script.open() as f:
@@ -288,10 +289,13 @@ def start_latte():
         logger.debug("", exc_info=True)
 
 
-def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR):
+def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=False):
     """
     https://gist.github.com/bgreenlee/1402841
     """
+    if root:
+        cmd = "sudo {}".format(cmd)
+    logger.debug("Running Shell Command: %s", cmd)
     p = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
     )
