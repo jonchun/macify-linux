@@ -123,7 +123,7 @@ def get_template(template_name):
 
 
 def git_clone(repo_url, target_dir, flags=""):
-
+    # This method attempts to clone a git repo, and git pulls instead if it already exists.
     cmd = "git -C {} clone {} {}".format(target_dir, flags, repo_url)
     logger.info(cmd)
     logger.info("git cloning %s...", repo_url)
@@ -157,7 +157,7 @@ def install_plasmoid(plasmoid_dir, pretty_name=None):
     try:
         run_shell(cmd, stderr_level=logging.DEBUG)
     except subprocess.CalledProcessError as e:
-        if "already exists" in e.output:
+        if "already exist" in e.output:
             logger.warning("Plasmoid is already installed. Skipping: %s", plasmoid_dir)
         else:
             logger.error("Failed while installing plasmoid: %s", plasmoid_dir)
