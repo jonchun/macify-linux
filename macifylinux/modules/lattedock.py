@@ -1,6 +1,7 @@
 """latte-dock - Dock/Panel"""
 import logging
 import time
+from subprocess import CalledProcessError
 
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
@@ -48,7 +49,7 @@ def run(*args, **kwargs):
         "cd ~/sources/latte-dock/ && bash ./install.sh", stderr_level=logging.DEBUG,
     )
     # Start latte immediately after building it. This is to generate the initial configs.
-    u.start_latte()
+    start_latte()
 
     # wait 2 seconds to allow latte to start up
     time.sleep(2)
@@ -56,7 +57,7 @@ def run(*args, **kwargs):
 
 
 def configure_latte():
-    u.stop_latte()
+    stop_latte()
     logger.info("Removing default panels and configuring latte.")
     script = u.get_template("removeDefaultPanels.js")
     u.eval_plasma_script(script)
@@ -82,4 +83,27 @@ def configure_latte():
             "file": "~/.config/lattedockrc",
         }
     )
-    u.start_latte()
+    start_latte()
+
+
+def start_latte():
+    logger.debug("Starting Latte Dock.")
+    # execute it directly via Popen so that there are no open pipes when program exits.
+    # subprocess.Popen("nohup latte-dock > /dev/null 2>&1 &", shell=True)
+    try:
+        u.run_shell("gtk-launch org.kde.latte-dock.desktop")
+    except CalledProcessError as e:
+        logger.error("Problem while starting latte dock: %s", e)
+        logger.debug("", exc_info=True)
+
+
+def stop_latte():
+    logger.debug("Stopping Latte Dock.")
+    try:
+        u.run_shell("killall -9 latte-dock")
+    except CalledProcessError as e:
+        if e.returncode == 1:
+            pass
+        else:
+            logger.error("Problem while trying to stop latte-dock.")
+            logger.debug("", exc_info=True)

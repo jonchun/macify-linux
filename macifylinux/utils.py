@@ -157,21 +157,6 @@ def install_plasmoid(plasmoid_dir, pretty_name=None):
             logger.debug("", exc_info=True)
 
 
-def kparseconfig(config):
-    key = config.get("key")
-    value = config.get("value")
-    group = config.get("group", "")
-    file = config.get("file", "")
-
-    key = "--key {}".format(key)
-    if file:
-        file = "--file {}".format(file)
-    if group:
-        if not isinstance(group, list):
-            group = [group]
-        group_str = " ".join(group)
-
-
 def kconfig(config, action="", root=False):
     """
     {
@@ -264,29 +249,6 @@ def start_plasma():
 def restart_kwin():
     # execute it directly via Popen so that there are no open pipes when program exits.
     subprocess.Popen("kwin --replace > /dev/null 2>&1", shell=True)
-
-
-def stop_latte():
-    logger.debug("Stopping Latte Dock.")
-    try:
-        run_shell("killall -9 latte-dock > /dev/null 2>&1")
-    except subprocess.CalledProcessError as e:
-        if e.returncode == 1:
-            pass
-        else:
-            logger.error("Problem while trying to stop latte-dock.")
-            logger.debug("", exc_info=True)
-
-
-def start_latte():
-    logger.debug("Starting Latte Dock.")
-    # execute it directly via Popen so that there are no open pipes when program exits.
-    # subprocess.Popen("nohup latte-dock > /dev/null 2>&1 &", shell=True)
-    try:
-        subprocess.run("nohup latte-dock > /dev/null 2>&1 &", shell=True, check=True)
-    except subprocess.CalledProcessError as e:
-        logger.error("Problem while starting latte dock: %s", e)
-        logger.debug("", exc_info=True)
 
 
 def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=False):
