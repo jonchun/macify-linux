@@ -1,6 +1,7 @@
 """This module is responsible for all of the theming/fonts/icons"""
 import logging
 from pathlib import Path
+import tempfile
 
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
@@ -134,6 +135,29 @@ def configure(*args, **kwargs):
         },
         root=True,
     )
+
+    # Configure wallpaper of SDDM
+    with u.get_template("sddm/theme.conf.user").open() as f:
+        sddm_theme_conf = f.read()
+    sddm_theme_conf = sddm_theme_conf.replace(
+        "$BACKGROUND_IMAGE", G["DEFAULT_WALLPAPER"]
+    )
+
+    default_wallpaper = G["WALLPAPER_DIR"] / G["DEFAULT_WALLPAPER"]
+
+    # Create theme.user.conf (points to wallpaper) and move it to theme directory. Doing it weird like this because sudo is required.
+    tmp_file = tempfile.NamedTemporaryFile("w", delete=False)
+    tmp_file.write(sddm_theme_conf)
+    tmp_file.close()
+    logger.debug("Wallpaper: %s", default_wallpaper)
+    u.cp(default_wallpaper, "/usr/share/sddm/themes/plasma-chili", root=True)
+    tmp_file_path = Path(tmp_file.name)
+    tmp_file_path.chmod(0o664)
+    u.cp(
+        tmp_file_path, "/usr/share/sddm/themes/plasma-chili/theme.conf.user", root=True
+    )
+    tmp_file_path.unlink()
+
     # ========== END SDDM ==========
 
     # xsettingsd

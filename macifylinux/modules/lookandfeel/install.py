@@ -2,7 +2,6 @@
 import logging
 from pathlib import Path
 import subprocess
-import tempfile
 
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
@@ -93,30 +92,9 @@ def install_login_screen():
     )
     theme_path = Path("/usr/share/sddm/themes/plasma-chili")
     if theme_path.is_dir():
-        u.run_shell('rm -rf {}'. format(theme_path), root=True)
+        u.run_shell("rm -rf {}".format(theme_path), root=True)
 
     u.cp(kde_plasma_chili, theme_path, flags="r", root=True)
-
-    with u.get_template("sddm/theme.conf.user").open() as f:
-        sddm_theme_conf = f.read()
-    sddm_theme_conf = sddm_theme_conf.replace(
-        "$BACKGROUND_IMAGE", G["DEFAULT_WALLPAPER"]
-    )
-
-    default_wallpaper = G["WALLPAPER_DIR"] / G["DEFAULT_WALLPAPER"]
-
-    # Create theme.user.conf (points to wallpaper) and move it to theme directory. Doing it weird like this because sudo is required.
-    tmp_file = tempfile.NamedTemporaryFile("w", delete=False)
-    tmp_file.write(sddm_theme_conf)
-    tmp_file.close()
-    logger.debug("Wallpaper: %s", default_wallpaper)
-    u.cp(default_wallpaper, "/usr/share/sddm/themes/plasma-chili", root=True)
-    tmp_file_path = Path(tmp_file.name)
-    tmp_file_path.chmod(0o664)
-    u.cp(
-        tmp_file_path, "/usr/share/sddm/themes/plasma-chili/theme.conf.user", root=True
-    )
-    tmp_file_path.unlink()
 
 
 def install_themes():
