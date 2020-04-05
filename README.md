@@ -23,14 +23,16 @@ bash install.sh
 Before:
 ![macify-linux-1.png](https://raw.githubusercontent.com/Jonchun/macify-linux/master/images/macify-linux-before.png)
 
-After Script Finished Installing:
+After:
 ![macify-linux-1.png](https://raw.githubusercontent.com/Jonchun/macify-linux/master/images/macify-linux-1.png)
 
 Global Menu:
 ![macify-linux-2.png](https://raw.githubusercontent.com/Jonchun/macify-linux/master/images/macify-linux-2.png)
 
-Notification Center alternative:
+Dolphin File browser + Notifications Widget:
 ![macify-linux-3.png](https://raw.githubusercontent.com/Jonchun/macify-linux/master/images/macify-linux-3.png)
+
+Login Screen (Chili!!!):
 ![macify-linux-4.png](https://raw.githubusercontent.com/Jonchun/macify-linux/master/images/macify-linux-4.png)
 
 Spotlight search alternative (Albert):
