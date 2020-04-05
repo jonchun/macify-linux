@@ -82,8 +82,8 @@ def pre_applet_window_appmenu():
     ]
 
     # needed to add these packages when attempting to compile in Kubuntu 20.04
-    prerequisites_kubuntu = ["libx11-xcb-dev", "libxcb-randr0-dev"]
-    prerequisites.extend(prerequisites_kubuntu)
+    prerequisites_kubuntu_20 = ["libx11-xcb-dev", "libxcb-randr0-dev"]
+    prerequisites.extend(prerequisites_kubuntu_20)
 
     u.apt_install(
         prerequisites, "Window AppMenu plasmoid prerequisites",

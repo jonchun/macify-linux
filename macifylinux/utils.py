@@ -245,7 +245,7 @@ def setup_symlink(source, target, target_is_directory=False):
 def stop_plasma():
     logger.debug("Stopping Plasma.")
     try:
-        output = run_shell("kquitapp5 plasmashell")
+        output = run_shell("kquitapp5 plasmashell", stderr_level=logging.DEBUG)
     except subprocess.CalledProcessError as e:
         if "could not be found" in e.output:
             logger.debug("Tried to quit Plasmashell but it's not running.")
@@ -289,8 +289,11 @@ def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=
             line = io.readline().strip()
             if not line:
                 continue
-            logger.log(log_level[io], line[:-1].decode())
-            log_cache[io].append(line[:-1].decode())
+            try:
+                logger.log(log_level[io], line[:-1].decode())
+                log_cache[io].append(line[:-1].decode())
+            except UnicodeDecodeError:
+                continue
             """
             lines = io.readlines()
             for line in lines:
