@@ -34,6 +34,10 @@ def pre(*args, **kwargs):
         "qtdeclarative5-dev",
     ]
 
+    # needed to add these packages when attempting to compile in Kubuntu 18.04
+    prerequisites_kubuntu_18 = ["libkf5sysguard-dev"]
+    prerequisites.extend(prerequisites_kubuntu_18)
+
     u.apt_install(
         prerequisites, "latte-dock prerequisites",
     )

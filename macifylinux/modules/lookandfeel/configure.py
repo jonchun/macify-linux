@@ -162,11 +162,15 @@ def configure(*args, **kwargs):
 
     # xsettingsd
     # not sure what this is, but seems important...
-    xsettingsd_conf = Path("~/.config/xsettingsd/xsettingsd.conf").expanduser()
+    xsettingsd_dir = Path("~/.config/xsettingsd").expanduser()
+    xsettingsd_dir.mkdir(parents=True, exist_ok=True)
+    xsettingsd_conf = xsettingsd_dir / Path("xsettingsd.conf")
     xsettingsd_template = u.get_template("xsettingsd/xsettingsd.conf")
-    xsettingsd_conf.rename(
-        xsettingsd_conf.with_name("{}.bak".format(xsettingsd_conf.name))
-    )
+
+    if xsettingsd_conf.is_file():
+        xsettingsd_conf.rename(
+            xsettingsd_conf.with_name("{}.bak".format(xsettingsd_conf.name))
+        )
     with xsettingsd_template.open() as f:
         content = f.read()
     content = content.replace("$ICON_THEME", "Os-Catalina-icons").replace(

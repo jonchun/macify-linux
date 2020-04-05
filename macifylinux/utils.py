@@ -123,7 +123,7 @@ def get_template(template_name):
 
 
 def git_clone(repo_url, target_dir, flags=""):
-
+    # This method attempts to clone a git repo, and git pulls instead if it already exists.
     cmd = "git -C {} clone {} {}".format(target_dir, flags, repo_url)
     logger.info(cmd)
     logger.info("git cloning %s...", repo_url)
@@ -157,7 +157,7 @@ def install_plasmoid(plasmoid_dir, pretty_name=None):
     try:
         run_shell(cmd, stderr_level=logging.DEBUG)
     except subprocess.CalledProcessError as e:
-        if "already exists" in e.output:
+        if "already exist" in e.output:
             logger.warning("Plasmoid is already installed. Skipping: %s", plasmoid_dir)
         else:
             logger.error("Failed while installing plasmoid: %s", plasmoid_dir)
@@ -244,7 +244,14 @@ def setup_symlink(source, target, target_is_directory=False):
 
 def stop_plasma():
     logger.debug("Stopping Plasma.")
-    run_shell("kquitapp5 plasmashell")
+    try:
+        output = run_shell("kquitapp5 plasmashell", stderr_level=logging.DEBUG)
+    except subprocess.CalledProcessError as e:
+        if "could not be found" in e.output:
+            logger.debug("Tried to quit Plasmashell but it's not running.")
+        else:
+            logger.error("Unexpected issue with stopping plasma.")
+            logger.debug("", exc_info=True)
 
 
 def start_plasma():
@@ -282,8 +289,11 @@ def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=
             line = io.readline().strip()
             if not line:
                 continue
-            logger.log(log_level[io], line[:-1].decode())
-            log_cache[io].append(line[:-1].decode())
+            try:
+                logger.log(log_level[io], line[:-1].decode())
+                log_cache[io].append(line[:-1].decode())
+            except UnicodeDecodeError:
+                continue
             """
             lines = io.readlines()
             for line in lines:
