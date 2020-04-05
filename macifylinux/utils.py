@@ -244,7 +244,14 @@ def setup_symlink(source, target, target_is_directory=False):
 
 def stop_plasma():
     logger.debug("Stopping Plasma.")
-    run_shell("kquitapp5 plasmashell")
+    try:
+        output = run_shell("kquitapp5 plasmashell")
+    except subprocess.CalledProcessError as e:
+        if "could not be found" in e.output:
+            logger.debug("Tried to quit Plasmashell but it's not running.")
+        else:
+            logger.error("Unexpected issue with stopping plasma.")
+            logger.debug("", exc_info=True)
 
 
 def start_plasma():
