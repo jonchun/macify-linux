@@ -16,11 +16,15 @@ def configure(*args, **kwargs):
     # https://userbase.kde.org/KDE_Connect/Tutorials/Useful_commands#Change_look_and_feel
     if style == "light":
         theme = "McMojave-light"
-        color_scheme = "McMojaveLight"
+        plasma_theme = "hellolight"
+        color_scheme = "HelloLight"
+        #color_scheme = "McMojaveLight"
     elif style == "dark":
         # todo. not tested/working.
         theme = "McMojave"
-        color_scheme = "McMojave"
+        plasma_theme = "hellodark"
+        color_scheme = "HelloDark"
+        #color_scheme = "McMojave"
 
     # run the lookandfeeltool
     cmd = "lookandfeeltool -a 'com.github.vinceliuice.{}'".format(theme)
@@ -100,8 +104,9 @@ def configure(*args, **kwargs):
     # ========== END KDEGLOBALS ==========
 
     # plasma theme
+    # hellolight
     u.kwriteconfig(
-        {"key": "name", "value": theme, "group": "Theme", "file": "~/.config/plasmarc",}
+        {"key": "name", "value": plasma_theme, "group": "Theme", "file": "~/.config/plasmarc",}
     )
 
     # Dolphin

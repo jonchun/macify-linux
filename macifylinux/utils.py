@@ -134,11 +134,11 @@ def git_clone(repo_url, target_dir, flags=""):
         return repo_dir
     except subprocess.CalledProcessError as e:
         if e.returncode == 128:
-            logger.info("%s already exists! git pull instead...", repo_url)
+            logger.info("%s already exists! git fetch instead...", repo_url)
 
             commands = [
                 "cd {}".format(repo_dir),
-                "git pull",
+                "git fetch",
             ]
             run_shell(
                 " && ".join(commands), stderr_level=logging.DEBUG,
