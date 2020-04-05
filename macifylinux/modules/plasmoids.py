@@ -27,9 +27,11 @@ def pre(*args, **kwargs):
         "https://github.com/psifidotos/applet-latte-sidebar-button.git",
         G["SOURCES_DIR"],
     )
+    """
     u.git_clone(
         "https://github.com/Zren/plasma-applet-eventcalendar.git", G["SOURCES_DIR"]
     )
+    """
     u.git_clone("https://gitlab.com/divinae/uswitch.git", G["SOURCES_DIR"])
     return True
 
@@ -59,10 +61,12 @@ def run(*args, **kwargs):
     mac_inline_battery = Path("~/sources/mac-inline-battery").expanduser()
     u.install_plasmoid(mac_inline_battery)
 
+    """
     plasma_applet_eventcalendar = Path(
         "~/sources/plasma-applet-eventcalendar/package/"
     ).expanduser()
     u.install_plasmoid(plasma_applet_eventcalendar, pretty_name="eventcalendar")
+    """
 
     uswitch = Path("~/sources/uswitch/package").expanduser()
     u.install_plasmoid(uswitch, pretty_name="uswitch")

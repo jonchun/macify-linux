@@ -29,7 +29,7 @@ def install_cursors():
         mcmojave_cursors, G['ICONS_DIR'] / Path("McMojave-cursors"), recursive=True,
     )
     """
-    u.cp(mcmojave_cursors, G["ICONS_DIR"] / Path("McMojave-cursors"), "r")
+    u.cp(mcmojave_cursors, G["ICONS_DIR"] / Path("McMojave-cursors"), "Tr")
 
 
 def install_fonts():
@@ -185,5 +185,61 @@ def install_wallpapers():
 
 
 def install_window_decorations():
-    u.apt_add_ppa("krisives/kde-hello")
-    u.apt_install(["kde-hello"], "kde-hello window decorations")
+    # u.apt_add_ppa("krisives/kde-hello")
+    # u.apt_install(["kde-hello"], "kde-hello window decorations")
+
+    prerequisites = [
+        "build-essential",
+        "cmake",
+        "extra-cmake-modules",
+        "g++",
+        "gettext",
+        "kinit-dev",
+        "kwin-dev",
+        "libkdecorations2-dev",
+        "libkf5config-dev",
+        "libkf5configwidgets-dev",
+        "libkf5coreaddons-dev",
+        "libkf5crash-dev",
+        "libkf5globalaccel-dev",
+        "libkf5guiaddons-dev",
+        "libkf5kio-dev",
+        "libkf5notifications-dev",
+        "libkf5package-dev",
+        "libkf5windowsystem-dev",
+        "libqt5x11extras5-dev",
+        "qtbase5-dev",
+        "qtdeclarative5-dev",
+        "qttools5-dev",
+    ]
+    u.apt_install(
+        prerequisites, "hello build prerequisites",
+    )
+    u.git_clone("https://github.com/Jonchun/hello.git", G["SOURCES_DIR"])
+
+    logger.info("Building window decorations. This can take a while...")
+    # "bash build.sh",
+    current_file = Path(__file__)
+    bash_file = current_file.with_name("{}.sh".format(current_file.stem))
+    u.run_shell("bash {}".format(bash_file))
+
+    u.run_shell("cd ~/sources/hello/window-decoration && bash ./build.sh")
+
+    # colors
+    hello_light_colors = Path(
+        "~/sources/hello/color-scheme/HelloLight.colors"
+    ).expanduser()
+    hello_dark_colors = Path(
+        "~/sources/hello/color-scheme/HelloDark.colors"
+    ).expanduser()
+
+    u.cp(hello_light_colors, G["COLOR_SCHEMES_DIR"])
+    u.cp(hello_dark_colors, G["COLOR_SCHEMES_DIR"])
+
+    # Plasma Theme
+    hello_light_plasma = Path("~/sources/hello/plasma-theme/hellolight").expanduser()
+
+    hello_dark_plasma = Path("~/sources/hello/plasma-theme/hellodark").expanduser()
+
+    u.cp(hello_light_plasma, G["PLASMA_DIR"] / hello_light_plasma.name, "Tr")
+    u.cp(hello_dark_plasma, G["PLASMA_DIR"] / hello_dark_plasma.name, "Tr")
