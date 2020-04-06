@@ -100,9 +100,33 @@ def cp(source, dest, flags="", root=False):
         logger.debug("cp flags: %s", flags, exc_info=True)
 
 
+def bash_action(*args, name=None, file=None, action="install"):
+    # attempts to run $action.sh inside of the same directory as the current file.
+    # ~/macify-linux/macifylinux/modules/example/__init__.py -> ~/macify-linux/macifylinux/modules/example/install.sh
+    bash_file = Path(file).parent / Path("{}.sh".format(action))
+    if bash_file.is_file():
+        run_shell("bash {} {}".format(bash_file, " ".join(args)))
+    else:
+        logger.debug("No `%s.sh` found for component: %s.", action, name)
+
+
 def download_url(url, target):
     logger.debug("Downloading url: %s", url)
     urllib.request.urlretrieve(url, target)
+
+
+def get_module_requirements(module):
+    module_apt_req = []
+    components = module.components
+    for component in components:
+        try:
+            component_apt_req = component.apt_requirements
+            module_apt_req.extend(component_apt_req)
+        except AttributeError:
+            # If component doesn't have apt_requirements, assume no requirements.
+            continue
+    # just get rid of duplicates by turning into a set and then back to a list
+    return list(set(module_apt_req))
 
 
 def get_sudo():
@@ -265,15 +289,28 @@ def restart_kwin():
     subprocess.Popen("kwin --replace > /dev/null 2>&1", shell=True)
 
 
-def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=False):
+def run_shell(
+    cmd,
+    stdout_level=logging.INFO,
+    stderr_level=logging.WARNING,
+    root=False,
+    change_dir=None,
+):
     """
     https://gist.github.com/bgreenlee/1402841
     """
+    # this gets the root path of the main python module
+    module_path = Path(__file__).parent
+    cmds = []
+
+    # cd to the the root path first so we always know exactly where we are starting our bash scripts.
+    cmds.append("cd {}".format(module_path))
     if root:
         cmd = "sudo {}".format(cmd)
+    cmds.append(cmd)
     logger.debug("Running Shell Command: %s", cmd)
     p = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        " && ".join(cmds), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
     )
 
     log_level = {p.stdout: stdout_level, p.stderr: stderr_level}
@@ -290,8 +327,8 @@ def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=
             if not line:
                 continue
             try:
-                logger.log(log_level[io], line[:-1].decode())
-                log_cache[io].append(line[:-1].decode())
+                logger.log(log_level[io], line.decode().rstrip())
+                log_cache[io].append(line.decode().rstrip())
             except UnicodeDecodeError:
                 continue
             """
@@ -317,3 +354,12 @@ def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=
 
     ret_dict = {"stdout": log_cache[p.stdout], "stderr": log_cache[p.stderr]}
     return ret_dict
+
+
+def run_shell_bg(cmd):
+    """
+    When you want to just ignore all output and one-shot run something, this is helpful.
+    e.g. this is useful if you want to start lattedock in the background and don't care about its output spamming up the session.
+    https://gist.github.com/yinjimmy/d6ad0742d03d54518e9f
+    """
+    subprocess.Popen("{} > /dev/null 2>&1 &".format(cmd), shell=True, close_fds=True)
