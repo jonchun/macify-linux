@@ -34,7 +34,7 @@ def apt_install(package_names, display_name=None):
         logger.debug("Package List: %s", packages, exc_info=True)
 
 
-def change_wallpaper(wallpaper_file):
+def change_desktop_wallpaper(wallpaper_file):
     with get_template("changeWallpaper.js").open() as f:
         wallpaper_script = f.read()
     wallpaper_script = wallpaper_script.replace("$IMAGE_PATH", str(wallpaper_file))
@@ -173,19 +173,33 @@ def git_clone(repo_url, target_dir, flags=""):
         return False
 
 
-def install_plasmoid(plasmoid_dir, pretty_name=None):
+def plasmoid_install(plasmoid_dir, pretty_name=None):
+    plasmoid_tool(plasmoid_dir, action="install", pretty_name=pretty_name)
+
+
+def plasmoid_remove(plasmoid_dir, pretty_name=None):
+    plasmoid_tool(plasmoid_dir, action="upgrade", pretty_name=pretty_name)
+
+
+def plasmoid_tool(plasmoid_dir, action=None, pretty_name=None):
+    if not action:
+        raise Exception("Invalid action")
     if not pretty_name:
         pretty_name = plasmoid_dir.name
-    logger.info("Installing Plasmoid: %s", pretty_name)
-    cmd = "kpackagetool5 -t Plasma/Applet --install {}".format(plasmoid_dir)
+    logger.info("Plasmoid %s starting: %s", action, pretty_name)
+    cmd = "kpackagetool5 -t Plasma/Applet --{} {}".format(action, plasmoid_dir)
     try:
         run_shell(cmd, stderr_level=logging.DEBUG)
     except subprocess.CalledProcessError as e:
         if "already exist" in e.output:
             logger.warning("Plasmoid is already installed. Skipping: %s", plasmoid_dir)
         else:
-            logger.error("Failed while installing plasmoid: %s", plasmoid_dir)
+            logger.error("Failed during %s for plasmoid: %s", action, plasmoid_dir)
             logger.debug("", exc_info=True)
+
+
+def plasmoid_upgrade(plasmoid_dir, pretty_name=None):
+    plasmoid_tool(plasmoid_dir, action="upgrade", pretty_name=pretty_name)
 
 
 def kconfig(config, action="", root=False):
@@ -299,14 +313,19 @@ def run_shell(
     """
     https://gist.github.com/bgreenlee/1402841
     """
+
+    # Commands to run
+    cmds = []
     # this gets the root path of the main python module
     module_path = Path(__file__).parent
-    cmds = []
-
-    # cd to the the root path first so we always know exactly where we are starting our bash scripts.
+    # always cd to the the root path first so we always know exactly where we are starting our bash scripts.
     cmds.append("cd {}".format(module_path))
+
     if root:
         cmd = "sudo {}".format(cmd)
+
+    # strip any whitespace from command
+    cmd = cmd.strip()
     cmds.append(cmd)
     logger.debug("Running Shell Command: %s", cmd)
     p = subprocess.Popen(

@@ -1,11 +1,11 @@
-"""Albert"""
+"""Custom Wallpaper"""
 import logging
 from pathlib import Path
 
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
 
-apt_requirements = ['curl']
+apt_requirements = ["curl"]
 component_name = "custom_wallpaper"
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
@@ -13,11 +13,12 @@ logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 def install(*args, **kwargs):
     # run install.sh
     u.bash_action(action="install", file=__file__, name=component_name)
-    wallpaper = G["WALLPAPERS_DIR"] / Path(G["DEFAULT_WALLPAPER"])
-    u.change_wallpaper(wallpaper)
 
-    # Configure wallpaper of lockscreen
+    # change desktop wallapaper
     wallpaper = G["WALLPAPERS_DIR"] / Path(G["DEFAULT_WALLPAPER"])
+    u.change_desktop_wallpaper(wallpaper)
+
+    # change lockscreen wallpaper
     u.kwriteconfig(
         {
             "key": "Image",
@@ -26,6 +27,7 @@ def install(*args, **kwargs):
             "file": "~/.config/kscreenlockerrc",
         }
     )
+
 
 def upgrade(*args, **kwargs):
     install(*args, **kwargs)

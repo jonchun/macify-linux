@@ -1,4 +1,4 @@
-"""Chili Login Screen"""
+"""Latte Separator Plasmoid"""
 import logging
 from pathlib import Path
 
@@ -9,20 +9,19 @@ component_name = Path(__file__).parent
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = []
-repo_url = "https://github.com/Jonchun/hello.git"
+repo_url = "https://github.com/psifidotos/applet-latte-separator.git"
 repo_name = Path(repo_url).stem
 
 
 def install(*args, **kwargs):
-    u.git_clone("https://github.com/MarianArlt/kde-plasma-chili.git", G["SOURCES_DIR"])
-    # run install.sh
-    u.bash_action(action="install", file=__file__, name=component_name)
+    u.git_clone(repo_url, G["SOURCES_DIR"])
+    u.plasmoid_install(G["SOURCES_DIR"] / Path(repo_name))
 
 
 def upgrade(*args, **kwargs):
-    install(*args, **kwargs)
+    u.plasmoid_upgrade(G["SOURCES_DIR"] / Path(repo_name))
 
 
 def remove(*args, **kwargs):
     # run remove.sh
-    u.bash_action(action="remove", file=__file__, name=component_name)
+    u.plasmoid_remove(G["SOURCES_DIR"] / Path(repo_name))

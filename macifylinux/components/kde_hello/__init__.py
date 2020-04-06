@@ -1,9 +1,12 @@
-"""Albert"""
+"""Hello Window Decorations"""
 import logging
 from pathlib import Path
 
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
+
+component_name = Path(__file__).parent
+logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = [
     "build-essential",
@@ -29,11 +32,12 @@ apt_requirements = [
     "qtdeclarative5-dev",
     "qttools5-dev",
 ]
-component_name = "kde_hello"
-logger = logging.getLogger("macifylinux.components.{}".format(component_name))
+repo_url = "https://github.com/Jonchun/hello.git"
+repo_name = Path(repo_url).stem
 
 
 def install(*args, **kwargs):
+    u.git_clone(repo_url, G["SOURCES_DIR"])
     # run install.sh
     u.bash_action(action="install", file=__file__, name=component_name)
 

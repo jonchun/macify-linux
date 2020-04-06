@@ -279,6 +279,5 @@ def configure(style="light"):
         }
     )
 
-
     u.start_plasma()
     u.restart_kwin()

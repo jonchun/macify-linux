@@ -1,3 +1,3 @@
 #!/bin/bash
 eval "$(python3 globals.py)"
-echo "Uninstalled!"
+echo "Not Implemented!"

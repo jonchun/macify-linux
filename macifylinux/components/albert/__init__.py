@@ -1,10 +1,11 @@
+"""Albert"""
 import logging
 from pathlib import Path
 
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
 
-component_name = "albert"
+component_name = Path(__file__).parent
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = [
@@ -17,9 +18,12 @@ apt_requirements = [
     "python3-distutils",
     "qtdeclarative5-dev",
 ]
+repo_url = "https://github.com/Jonchun/albert.git"
+repo_name = Path(repo_url).stem
 
 
 def install(*args, **kwargs):
+    u.git_clone(repo_url, G["SOURCES_DIR"])
     # run install.sh
     u.bash_action(action="install", file=__file__, name=component_name)
 

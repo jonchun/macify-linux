@@ -1,24 +1,25 @@
-"""Albert"""
+"""SF Fonts"""
 import logging
 from pathlib import Path
 
+from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
 
-apt_requirements = []
-component_name = "sf_fonts"
+component_name = Path(__file__).parent
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
+
+apt_requirements = []
+repo_url = "https://github.com/blaisck/sfwin.git"
+repo_name = Path(repo_url).stem
 
 
 def install(*args, **kwargs):
+    u.git_clone(repo_url, G["SOURCES_DIR"])
     # run install.sh
     u.bash_action(action="install", file=__file__, name=component_name)
 
 
 def upgrade(*args, **kwargs):
-    """
-    By default, upgrade() just runs install(). To customize, I recommend following the same pattern:
-    ~/macify-linux/macifylinux/modules/example/__init__.py -> ~/macify-linux/macifylinux/modules/example/upgrade.sh
-    """
     install(*args, **kwargs)
 
 

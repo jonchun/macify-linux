@@ -49,8 +49,8 @@ def run():
 
     modules = []
     # modules.append(m.spotlight)
-    modules.append(m.lookandfeel)
-    # modules.append(m.plasmoids)
+    # modules.append(m.lookandfeel)
+    modules.append(m.plasmoids)
     # # albert should be installed after lookandfeel due to icons
     # modules.append(m.albert)
     # # lattedock should be installed AFTER plasmoids so that they will show up.
