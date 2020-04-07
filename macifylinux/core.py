@@ -35,6 +35,33 @@ def install_prerequisites():
     )
 
 
+def print_requirements(modules):
+    for module in modules:
+        if isinstance(module, tuple):
+            module, _, _ = module
+        module_reqs = u.get_module_requirements(module)
+        print("Module: {}".format(Path(module.__file__).stem))
+        module_reqs.sort()
+        for req in module_reqs:
+            print("    {}".format(req))
+        print("")
+
+
+def print_components(modules):
+    for module in modules:
+        if isinstance(module, tuple):
+            module, _, _ = module
+        module_components = module.components
+        print("Module: {}".format(Path(module.__file__).stem))
+        for component in module_components:
+            try:
+                repo_url = component.repo_url
+                print("    {}: {}".format(component.component_name, repo_url))
+            except Exception as e:
+                print("    {}: No git repo available".format(component.component_name))
+        print("")
+
+
 def run():
     configure_logging()
     u.get_sudo()
