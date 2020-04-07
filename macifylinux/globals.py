@@ -29,9 +29,6 @@ G["LOCAL_DIRS"].append(G["LAYOUTS_DIR"])
 G["KVANTUM_DIR"] = Path("~/.config/Kvantum/").expanduser()
 G["LOCAL_DIRS"].append(G["KVANTUM_DIR"])
 
-G["LATTE_DIR"] = Path("~/.config/latte/").expanduser()
-G["LOCAL_DIRS"].append(G["LATTE_DIR"])
-
 G["WALLPAPERS_DIR"] = Path("~/.local/share/wallpapers/").expanduser()
 G["LOCAL_DIRS"].append(G["WALLPAPERS_DIR"])
 

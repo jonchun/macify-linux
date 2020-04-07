@@ -1,6 +1,7 @@
-"""Latte Spacer Plasmoid"""
+"""Kinto"""
 import logging
 from pathlib import Path
+import subprocess
 
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
@@ -8,20 +9,23 @@ import macifylinux.utils as u
 component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
-apt_requirements = []
-repo_url = "https://github.com/psifidotos/applet-latte-spacer.git"
+apt_requirements = ["xbindkeys", "xdotool", "ibus"]
+repo_url = "https://github.com/rbreaves/kinto.git"
 repo_name = Path(repo_url).stem
 
 
 def install(*args, **kwargs):
     u.git_clone(repo_url, G["SOURCES_DIR"])
-    u.plasmoid_install(G["SOURCES_DIR"] / Path(repo_name))
+    # run install.sh
+    u.bash_action(
+        action="install", file=__file__, name=component_name, interactive=True
+    )
 
 
 def upgrade(*args, **kwargs):
-    u.plasmoid_upgrade(G["SOURCES_DIR"] / Path(repo_name))
+    install(*args, **kwargs)
 
 
 def remove(*args, **kwargs):
     # run remove.sh
-    u.plasmoid_remove(G["SOURCES_DIR"] / Path(repo_name))
+    u.bash_action(action="remove", file=__file__, name=component_name)

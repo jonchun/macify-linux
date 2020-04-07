@@ -5,7 +5,7 @@ from pathlib import Path
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
 
-component_name = Path(__file__).parent
+component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = [
@@ -23,9 +23,9 @@ repo_name = Path(repo_url).stem
 
 
 def install(*args, **kwargs):
-    u.git_clone(repo_url, G["SOURCES_DIR"])
+    u.git_clone(repo_url, G["SOURCES_DIR"], flags="--branch MacifyLinux --recursive")
     # run install.sh
-    u.bash_action(action="install", file=__file__, name=component_name)
+    u.bash_action(action="install", file=__file__, name=component_name, stderr_level=logging.DEBUG)
 
     # run configure.sh
     u.bash_action(action="configure", file=__file__, name=component_name)

@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+import re
 import select
 import subprocess
 import shutil
@@ -100,19 +101,44 @@ def cp(source, dest, flags="", root=False):
         logger.debug("cp flags: %s", flags, exc_info=True)
 
 
+"""
 def bash_action(*args, name=None, file=None, action="install"):
     # attempts to run $action.sh inside of the same directory as the current file.
     # ~/macify-linux/macifylinux/modules/example/__init__.py -> ~/macify-linux/macifylinux/modules/example/install.sh
     bash_file = Path(file).parent / Path("{}.sh".format(action))
     if bash_file.is_file():
-        run_shell("bash {} {}".format(bash_file, " ".join(args)))
+        run_shell("cd {} && bash {} {}".format(Path(__file__).parent, bash_file, " ".join(args)))
     else:
         logger.debug("No `%s.sh` found for component: %s.", action, name)
+"""
 
 
-def download_url(url, target):
-    logger.debug("Downloading url: %s", url)
-    urllib.request.urlretrieve(url, target)
+def bash_action(*args, name=None, file=None, action="install", interactive=False, stdout_level=None, stderr_level=None):
+    # attempts to run $action.sh inside of the same directory as the current file.
+    # ~/macify-linux/macifylinux/modules/example/__init__.py -> ~/macify-linux/macifylinux/modules/example/install.sh
+    bash_file = Path(file).parent / Path("{}.sh".format(action))
+    if bash_file.is_file():
+        commands = []
+        # cd into the root module directory first.
+        commands.append("cd {}".format(Path(__file__).parent))
+        # execute `action.sh` and pass along any args.
+        commands.append("bash {} {}".format(bash_file, " ".join(args)))
+        if interactive:
+            try:
+                subprocess.run(" && ".join(commands), shell=True, check=True)
+            except subprocess.CalledProcessError:
+                logger.error("Problem while interactively executing: `%s`", bash_file)
+                logger.debug("", exc_info=True)
+        else:
+            # This is a bit confusing, but basically allowing for optional kwargs stdout_level and stderr_level to be passed through
+            log_levels = {}
+            if stdout_level:
+                log_levels['stdout_level'] = stdout_level
+            if stderr_level:
+                log_levels['stderr_level'] = stderr_level
+            run_shell(" && ".join(commands), **log_levels)
+    else:
+        logger.debug("No `%s.sh` found for component: %s.", action, name)
 
 
 def get_module_requirements(module):
@@ -258,6 +284,14 @@ def kwriteconfigs(file, configs, root=False):
         kconfig(config, action="write", root=root)
 
 
+ANSI_ESCAPE_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+
+
+def remove_ansi_escape(text):
+    # https://stackoverflow.com/a/14693789/13207210
+    return ANSI_ESCAPE_RE.sub("", text)
+
+
 def setup_symlink(source, target, target_is_directory=False):
     """Backs up any existing target to target_bak and then creates a symlink from source to target"""
     if target_is_directory:
@@ -305,7 +339,7 @@ def restart_kwin():
 
 def run_shell(
     cmd,
-    stdout_level=logging.INFO,
+    stdout_level=logging.DEBUG,
     stderr_level=logging.WARNING,
     root=False,
     change_dir=None,

@@ -5,7 +5,7 @@ from pathlib import Path
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
 
-component_name = Path(__file__).parent
+component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = []

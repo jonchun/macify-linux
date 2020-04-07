@@ -26,12 +26,12 @@ make
 sudo make install
 
 # Install hello colors
-cp -f ${SOURCES_DIR}/${REPO_NAME}/color-scheme/HelloLight.colors ${COLOR_SCHEMES_DIR}
-cp -f ${SOURCES_DIR}/${REPO_NAME}/color-scheme/HelloDark.colors ${COLOR_SCHEMES_DIR}
+cp -f ${REPO_DIR}/color-scheme/HelloLight.colors ${COLOR_SCHEMES_DIR}
+cp -f ${REPO_DIR}/color-scheme/HelloDark.colors ${COLOR_SCHEMES_DIR}
 
 # Install hello plasma theme
-cp -rf ${SOURCES_DIR}/${REPO_NAME}/plasma-theme/hellolight ${PLASMA_DIR}
-cp -rf ${SOURCES_DIR}/${REPO_NAME}/plasma-theme/hellodark ${PLASMA_DIR}
+cp -rf ${REPO_DIR}/plasma-theme/hellolight ${PLASMA_DIR}
+cp -rf ${REPO_DIR}/plasma-theme/hellodark ${PLASMA_DIR}
 
 kwin_x11 --replace &
 plasmashell --replace &

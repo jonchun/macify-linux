@@ -48,22 +48,21 @@ def run():
         local_dir.mkdir(parents=True, exist_ok=True)
 
     modules = []
-    # modules.append(m.spotlight)
-    # modules.append(m.lookandfeel)
+    # install Kinto(hotkeys module) first because it requires user interaction. 
+    modules.append(m.hotkeys)
+    # modules.append((m.lookandfeel, [], {"style": "light"}))
+    modules.append(m.lookandfeel)
+    # spotlight should be installed after lookandfeel because it needs access to the installed icons
+    modules.append(m.spotlight)
     modules.append(m.plasmoids)
-    # # albert should be installed after lookandfeel due to icons
-    # modules.append(m.albert)
-    # # lattedock should be installed AFTER plasmoids so that they will show up.
-    # modules.append(m.lattedock)
-    # modules.append((m.kinto, [], {"style": "light"}))
+    # dockandpanel should be installed AFTER plasmoids because latte-dock depends on the installed plasmoids.
+    modules.append(m.dockandpanel)
 
     for module in modules:
         args = []
         kwargs = {}
         if isinstance(module, tuple):
-            args = module[1]
-            kwargs = module[2]
-            module = module[0]
+            module, args, kwargs = module
 
         pretty_name = module.__doc__
         if not pretty_name:
