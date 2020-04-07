@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=macify-linux-dark
+Comment=macify-linux dark theme
+Encoding=UTF-8
+Keywords=Desktop;Workspace;Appearance;Look and Feel;
+
+Type=Service
+
+X-KDE-ServiceTypes=Plasma/LookAndFeel
+X-KDE-ParentApp=
+X-KDE-PluginInfo-Author=Jonathan Chun
+X-KDE-PluginInfo-Category=
+X-KDE-PluginInfo-Email=git@jonathanchun.com
+X-KDE-PluginInfo-License=GPL3.0
+X-KDE-PluginInfo-Name=com.github.jonchun.macify-linux-dark
+X-KDE-PluginInfo-Version=
+X-KDE-PluginInfo-Website=https://github.com/Jonchun/macify-linux
+X-KDE-fallbackPackage=org.kde.breeze.desktop
+X-Plasma-MainScript=defaults

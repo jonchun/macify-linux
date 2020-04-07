@@ -6,8 +6,10 @@ import tempfile
 from macifylinux.components import custom_wallpaper
 from macifylinux.components import kde_hello
 from macifylinux.components import kde_plasma_chili
+from macifylinux.components import macify_linux_lookandfeel
 from macifylinux.components import mcmojave_cursors
-from macifylinux.components import mcmojave_kde
+
+# from macifylinux.components import mcmojave_kde
 from macifylinux.components import notification_center
 from macifylinux.components import os_catalina_icons
 from macifylinux.components import sf_fonts
@@ -18,6 +20,7 @@ import macifylinux.utils as u
 logger = logging.getLogger("macifylinux.modules.lookandfeel")
 
 components = [
+    macify_linux_lookandfeel,
     custom_wallpaper,
     mcmojave_cursors,
     notification_center,
@@ -30,22 +33,23 @@ components = [
 
 def install(*args, **kwargs):
     # install mcmojave_kde first as it is the base theme. everything else overwrites it.
-    mcmojave_kde.install(*args, **kwargs)
-    style = kwargs.get("style", "light")
-    if style == "light":
-        theme = "McMojave-light"
-    elif style == "dark":
-        # todo. not tested/working.
-        theme = "McMojave"
+    # mcmojave_kde.install(*args, **kwargs)
+    # style = kwargs.get("style", "light")
+    # if style == "light":
+    #     theme = "McMojave-light"
+    # elif style == "dark":
+    #     # todo. not tested/working.
+    #     theme = "McMojave"
 
     # https://userbase.kde.org/KDE_Connect/Tutorials/Useful_commands#Change_look_and_feel
-    cmd = "lookandfeeltool -a 'com.github.vinceliuice.{}'".format(theme)
-    u.run_shell(cmd, stderr_level=logging.DEBUG)
 
     for component in components:
         component.install(*args, **kwargs)
 
     configure(*args, **kwargs)
+
+    cmd = "lookandfeeltool -a 'com.github.jonchun.{}'".format("macify-linux-light")
+    u.run_shell(cmd, stderr_level=logging.DEBUG)
 
 
 def upgrade(*args, **kwargs):

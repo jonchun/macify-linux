@@ -216,13 +216,15 @@ def plasmoid_remove(plasmoid_dir, pretty_name=None):
     plasmoid_tool(plasmoid_dir, action="upgrade", pretty_name=pretty_name)
 
 
-def plasmoid_tool(plasmoid_dir, action=None, pretty_name=None):
+def plasmoid_tool(
+    plasmoid_dir, action=None, package_type="Plasma/Applet", pretty_name=None
+):
     if not action:
         raise Exception("Invalid action")
     if not pretty_name:
         pretty_name = plasmoid_dir.name
     logger.info("Plasmoid %s starting: %s", action, pretty_name)
-    cmd = "kpackagetool5 -t Plasma/Applet --{} {}".format(action, plasmoid_dir)
+    cmd = "kpackagetool5 --type {} --{} {}".format(package_type, action, plasmoid_dir)
     try:
         run_shell(cmd, stderr_level=logging.DEBUG)
     except subprocess.CalledProcessError as e:
