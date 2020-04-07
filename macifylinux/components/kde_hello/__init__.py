@@ -39,7 +39,9 @@ repo_name = Path(repo_url).stem
 def install(*args, **kwargs):
     u.git_clone(repo_url, G["SOURCES_DIR"])
     # run install.sh
-    u.bash_action(action="install", file=__file__, name=component_name, stderr_level=logging.DEBUG)
+    u.bash_action(
+        action="install", file=__file__, name=component_name, stderr_level=logging.DEBUG
+    )
 
 
 def upgrade(*args, **kwargs):

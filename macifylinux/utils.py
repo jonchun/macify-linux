@@ -113,7 +113,15 @@ def bash_action(*args, name=None, file=None, action="install"):
 """
 
 
-def bash_action(*args, name=None, file=None, action="install", interactive=False, stdout_level=None, stderr_level=None):
+def bash_action(
+    *args,
+    name=None,
+    file=None,
+    action="install",
+    interactive=False,
+    stdout_level=None,
+    stderr_level=None
+):
     # attempts to run $action.sh inside of the same directory as the current file.
     # ~/macify-linux/macifylinux/modules/example/__init__.py -> ~/macify-linux/macifylinux/modules/example/install.sh
     bash_file = Path(file).parent / Path("{}.sh".format(action))
@@ -133,9 +141,9 @@ def bash_action(*args, name=None, file=None, action="install", interactive=False
             # This is a bit confusing, but basically allowing for optional kwargs stdout_level and stderr_level to be passed through
             log_levels = {}
             if stdout_level:
-                log_levels['stdout_level'] = stdout_level
+                log_levels["stdout_level"] = stdout_level
             if stderr_level:
-                log_levels['stderr_level'] = stderr_level
+                log_levels["stderr_level"] = stderr_level
             run_shell(" && ".join(commands), **log_levels)
     else:
         logger.debug("No `%s.sh` found for component: %s.", action, name)
@@ -157,9 +165,10 @@ def get_module_requirements(module):
 
 def get_sudo():
     logger.info(
-        "This script will require sudo permissions for certain actions. You may be prompted for your credentials."
+        "This script will require sudo permissions for certain actions. You will be prompted for your credentials."
     )
     try:
+        run_shell("sudo -k")
         run_shell("sudo -v")
     except subprocess.CalledProcessError:
         logger.error("Unable to obtain sudo password. Exiting.")
@@ -284,12 +293,9 @@ def kwriteconfigs(file, configs, root=False):
         kconfig(config, action="write", root=root)
 
 
-ANSI_ESCAPE_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-
-
-def remove_ansi_escape(text):
-    # https://stackoverflow.com/a/14693789/13207210
-    return ANSI_ESCAPE_RE.sub("", text)
+def restart_kwin():
+    # execute it directly via Popen so that there are no open pipes when program exits.
+    subprocess.Popen("kwin --replace > /dev/null 2>&1", shell=True)
 
 
 def setup_symlink(source, target, target_is_directory=False):
@@ -314,6 +320,12 @@ def setup_symlink(source, target, target_is_directory=False):
     return True
 
 
+def start_plasma():
+    logger.debug("Starting Plasma.")
+    # execute it directly via Popen so that there are no open pipes when program exits.
+    subprocess.Popen("kstart5 plasmashell > /dev/null 2>&1", shell=True)
+
+
 def stop_plasma():
     logger.debug("Stopping Plasma.")
     try:
@@ -324,17 +336,6 @@ def stop_plasma():
         else:
             logger.error("Unexpected issue with stopping plasma.")
             logger.debug("", exc_info=True)
-
-
-def start_plasma():
-    logger.debug("Starting Plasma.")
-    # execute it directly via Popen so that there are no open pipes when program exits.
-    subprocess.Popen("kstart5 plasmashell > /dev/null 2>&1", shell=True)
-
-
-def restart_kwin():
-    # execute it directly via Popen so that there are no open pipes when program exits.
-    subprocess.Popen("kwin --replace > /dev/null 2>&1", shell=True)
 
 
 def run_shell(

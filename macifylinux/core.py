@@ -48,7 +48,7 @@ def run():
         local_dir.mkdir(parents=True, exist_ok=True)
 
     modules = []
-    # install Kinto(hotkeys module) first because it requires user interaction. 
+    # install Kinto(hotkeys module) first because it requires user interaction.
     modules.append(m.hotkeys)
     # modules.append((m.lookandfeel, [], {"style": "light"}))
     modules.append(m.lookandfeel)
