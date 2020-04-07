@@ -3,6 +3,7 @@ from macifylinux.components import applet_latte_separator
 from macifylinux.components import applet_latte_sidebar_button
 from macifylinux.components import applet_latte_spacer
 from macifylinux.components import applet_window_title
+from macifylinux.components import applet_window_appmenu
 from macifylinux.components import kde_plasmoid_chiliclock
 from macifylinux.components import mac_inline_battery
 from macifylinux.components import uswitch
@@ -12,6 +13,7 @@ components = [
     applet_latte_sidebar_button,
     applet_latte_spacer,
     applet_window_title,
+    applet_window_appmenu,
     kde_plasmoid_chiliclock,
     mac_inline_battery,
     uswitch,

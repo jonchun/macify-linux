@@ -18,6 +18,16 @@ def install(*args, **kwargs):
     # run install.sh
     u.bash_action(action="install", file=__file__, name=component_name)
 
+    # icons
+    u.kwriteconfig(
+        {
+            "file": "~/.config/kdeglobals",
+            "group": "Icons",
+            "key": "Theme",
+            "value": "Os-Catalina-icons",
+        }
+    )
+
 
 def upgrade(*args, **kwargs):
     install(*args, **kwargs)

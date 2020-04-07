@@ -169,7 +169,7 @@ def get_sudo():
     )
     try:
         run_shell("sudo -k")
-        run_shell("sudo -v")
+        run_shell("sudo -v", stderr_level=logging.DEBUG)
     except subprocess.CalledProcessError:
         logger.error("Unable to obtain sudo password. Exiting.")
         sys.exit(1)
@@ -296,6 +296,11 @@ def kwriteconfigs(file, configs, root=False):
 def restart_kwin():
     # execute it directly via Popen so that there are no open pipes when program exits.
     subprocess.Popen("kwin --replace > /dev/null 2>&1", shell=True)
+
+
+def restart_plasma():
+    # execute it directly via Popen so that there are no open pipes when program exits.
+    subprocess.Popen("plasmashell --replace > /dev/null 2>&1", shell=True)
 
 
 def setup_symlink(source, target, target_is_directory=False):

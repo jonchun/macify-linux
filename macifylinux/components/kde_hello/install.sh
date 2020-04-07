@@ -32,6 +32,3 @@ cp -f ${REPO_DIR}/color-scheme/HelloDark.colors ${COLOR_SCHEMES_DIR}
 # Install hello plasma theme
 cp -rf ${REPO_DIR}/plasma-theme/hellolight ${PLASMA_DIR}
 cp -rf ${REPO_DIR}/plasma-theme/hellodark ${PLASMA_DIR}
-
-kwin_x11 --replace &
-plasmashell --replace &
