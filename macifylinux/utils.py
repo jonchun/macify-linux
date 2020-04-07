@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+import re
 import select
 import subprocess
 import shutil
@@ -34,7 +35,7 @@ def apt_install(package_names, display_name=None):
         logger.debug("Package List: %s", packages, exc_info=True)
 
 
-def change_wallpaper(wallpaper_file):
+def change_desktop_wallpaper(wallpaper_file):
     with get_template("changeWallpaper.js").open() as f:
         wallpaper_script = f.read()
     wallpaper_script = wallpaper_script.replace("$IMAGE_PATH", str(wallpaper_file))
@@ -100,9 +101,58 @@ def cp(source, dest, flags="", root=False):
         logger.debug("cp flags: %s", flags, exc_info=True)
 
 
-def download_url(url, target):
-    logger.debug("Downloading url: %s", url)
-    urllib.request.urlretrieve(url, target)
+"""
+def bash_action(*args, name=None, file=None, action="install"):
+    # attempts to run $action.sh inside of the same directory as the current file.
+    # ~/macify-linux/macifylinux/modules/example/__init__.py -> ~/macify-linux/macifylinux/modules/example/install.sh
+    bash_file = Path(file).parent / Path("{}.sh".format(action))
+    if bash_file.is_file():
+        run_shell("cd {} && bash {} {}".format(Path(__file__).parent, bash_file, " ".join(args)))
+    else:
+        logger.debug("No `%s.sh` found for component: %s.", action, name)
+"""
+
+
+def bash_action(*args, name=None, file=None, action="install", interactive=False, stdout_level=None, stderr_level=None):
+    # attempts to run $action.sh inside of the same directory as the current file.
+    # ~/macify-linux/macifylinux/modules/example/__init__.py -> ~/macify-linux/macifylinux/modules/example/install.sh
+    bash_file = Path(file).parent / Path("{}.sh".format(action))
+    if bash_file.is_file():
+        commands = []
+        # cd into the root module directory first.
+        commands.append("cd {}".format(Path(__file__).parent))
+        # execute `action.sh` and pass along any args.
+        commands.append("bash {} {}".format(bash_file, " ".join(args)))
+        if interactive:
+            try:
+                subprocess.run(" && ".join(commands), shell=True, check=True)
+            except subprocess.CalledProcessError:
+                logger.error("Problem while interactively executing: `%s`", bash_file)
+                logger.debug("", exc_info=True)
+        else:
+            # This is a bit confusing, but basically allowing for optional kwargs stdout_level and stderr_level to be passed through
+            log_levels = {}
+            if stdout_level:
+                log_levels['stdout_level'] = stdout_level
+            if stderr_level:
+                log_levels['stderr_level'] = stderr_level
+            run_shell(" && ".join(commands), **log_levels)
+    else:
+        logger.debug("No `%s.sh` found for component: %s.", action, name)
+
+
+def get_module_requirements(module):
+    module_apt_req = []
+    components = module.components
+    for component in components:
+        try:
+            component_apt_req = component.apt_requirements
+            module_apt_req.extend(component_apt_req)
+        except AttributeError:
+            # If component doesn't have apt_requirements, assume no requirements.
+            continue
+    # just get rid of duplicates by turning into a set and then back to a list
+    return list(set(module_apt_req))
 
 
 def get_sudo():
@@ -149,19 +199,33 @@ def git_clone(repo_url, target_dir, flags=""):
         return False
 
 
-def install_plasmoid(plasmoid_dir, pretty_name=None):
+def plasmoid_install(plasmoid_dir, pretty_name=None):
+    plasmoid_tool(plasmoid_dir, action="install", pretty_name=pretty_name)
+
+
+def plasmoid_remove(plasmoid_dir, pretty_name=None):
+    plasmoid_tool(plasmoid_dir, action="upgrade", pretty_name=pretty_name)
+
+
+def plasmoid_tool(plasmoid_dir, action=None, pretty_name=None):
+    if not action:
+        raise Exception("Invalid action")
     if not pretty_name:
         pretty_name = plasmoid_dir.name
-    logger.info("Installing Plasmoid: %s", pretty_name)
-    cmd = "kpackagetool5 -t Plasma/Applet --install {}".format(plasmoid_dir)
+    logger.info("Plasmoid %s starting: %s", action, pretty_name)
+    cmd = "kpackagetool5 -t Plasma/Applet --{} {}".format(action, plasmoid_dir)
     try:
         run_shell(cmd, stderr_level=logging.DEBUG)
     except subprocess.CalledProcessError as e:
         if "already exist" in e.output:
             logger.warning("Plasmoid is already installed. Skipping: %s", plasmoid_dir)
         else:
-            logger.error("Failed while installing plasmoid: %s", plasmoid_dir)
+            logger.error("Failed during %s for plasmoid: %s", action, plasmoid_dir)
             logger.debug("", exc_info=True)
+
+
+def plasmoid_upgrade(plasmoid_dir, pretty_name=None):
+    plasmoid_tool(plasmoid_dir, action="upgrade", pretty_name=pretty_name)
 
 
 def kconfig(config, action="", root=False):
@@ -220,6 +284,14 @@ def kwriteconfigs(file, configs, root=False):
         kconfig(config, action="write", root=root)
 
 
+ANSI_ESCAPE_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+
+
+def remove_ansi_escape(text):
+    # https://stackoverflow.com/a/14693789/13207210
+    return ANSI_ESCAPE_RE.sub("", text)
+
+
 def setup_symlink(source, target, target_is_directory=False):
     """Backs up any existing target to target_bak and then creates a symlink from source to target"""
     if target_is_directory:
@@ -265,15 +337,33 @@ def restart_kwin():
     subprocess.Popen("kwin --replace > /dev/null 2>&1", shell=True)
 
 
-def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=False):
+def run_shell(
+    cmd,
+    stdout_level=logging.DEBUG,
+    stderr_level=logging.WARNING,
+    root=False,
+    change_dir=None,
+):
     """
     https://gist.github.com/bgreenlee/1402841
     """
+
+    # Commands to run
+    cmds = []
+    # this gets the root path of the main python module
+    module_path = Path(__file__).parent
+    # always cd to the the root path first so we always know exactly where we are starting our bash scripts.
+    cmds.append("cd {}".format(module_path))
+
     if root:
         cmd = "sudo {}".format(cmd)
+
+    # strip any whitespace from command
+    cmd = cmd.strip()
+    cmds.append(cmd)
     logger.debug("Running Shell Command: %s", cmd)
     p = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        " && ".join(cmds), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
     )
 
     log_level = {p.stdout: stdout_level, p.stderr: stderr_level}
@@ -290,8 +380,8 @@ def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=
             if not line:
                 continue
             try:
-                logger.log(log_level[io], line[:-1].decode())
-                log_cache[io].append(line[:-1].decode())
+                logger.log(log_level[io], line.decode().rstrip())
+                log_cache[io].append(line.decode().rstrip())
             except UnicodeDecodeError:
                 continue
             """
@@ -317,3 +407,12 @@ def run_shell(cmd, stdout_level=logging.DEBUG, stderr_level=logging.ERROR, root=
 
     ret_dict = {"stdout": log_cache[p.stdout], "stderr": log_cache[p.stderr]}
     return ret_dict
+
+
+def run_shell_bg(cmd):
+    """
+    When you want to just ignore all output and one-shot run something, this is helpful.
+    e.g. this is useful if you want to start lattedock in the background and don't care about its output spamming up the session.
+    https://gist.github.com/yinjimmy/d6ad0742d03d54518e9f
+    """
+    subprocess.Popen("{} > /dev/null 2>&1 &".format(cmd), shell=True, close_fds=True)

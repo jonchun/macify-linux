@@ -38,7 +38,9 @@ def install_prerequisites():
 def run():
     configure_logging()
     u.get_sudo()
-    logger.info("Only basic information will be output on screen. To see full debug logs, you can tail -f macifylinux.log.")
+    logger.info(
+        "Only basic information will be output on screen. To see full debug logs, you can tail -f macifylinux.log."
+    )
     install_prerequisites()
 
     # Make sure all of the local directories we want to use exist.
@@ -46,31 +48,36 @@ def run():
         local_dir.mkdir(parents=True, exist_ok=True)
 
     modules = []
+    # install Kinto(hotkeys module) first because it requires user interaction. 
+    modules.append(m.hotkeys)
+    # modules.append((m.lookandfeel, [], {"style": "light"}))
     modules.append(m.lookandfeel)
+    # spotlight should be installed after lookandfeel because it needs access to the installed icons
+    modules.append(m.spotlight)
     modules.append(m.plasmoids)
-    # albert should be installed after lookandfeel due to icons
-    modules.append(m.albert)
-    # lattedock should be installed AFTER plasmoids so that they will show up.
-    modules.append(m.lattedock)
-    modules.append((m.kinto, [], {"style": "light"}))
+    # dockandpanel should be installed AFTER plasmoids because latte-dock depends on the installed plasmoids.
+    modules.append(m.dockandpanel)
 
     for module in modules:
         args = []
         kwargs = {}
         if isinstance(module, tuple):
-            args = module[1]
-            kwargs = module[2]
-            module = module[0]
+            module, args, kwargs = module
 
         pretty_name = module.__doc__
         if not pretty_name:
             pretty_name = module.__name__
         logger.info("Installing module: %s", pretty_name)
-        if module.pre(*args, **kwargs):
-            module.run(*args, **kwargs)
-        else:
-            logger.error(
-                "Problem while processing prerequisites for: %s", module.__name__
-            )
+        module_reqs = u.get_module_requirements(module)
+        logger.debug("%s", module_reqs)
+        u.apt_install(module_reqs, "{} requirements".format(pretty_name))
+        module.install(*args, **kwargs)
+
+        # if module.pre(*args, **kwargs):
+        #     module.run(*args, **kwargs)
+        # else:
+        #     logger.error(
+        #         "Problem while processing prerequisites for: %s", module.__name__
+        #     )
 
     logger.info("Setup Complete. Please restart your machine.")

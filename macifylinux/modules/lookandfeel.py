@@ -1,30 +1,61 @@
-"""This module is responsible for all of the theming/fonts/icons"""
+"""Look and Feel Module"""
 import logging
 from pathlib import Path
 import tempfile
 
+from macifylinux.components import custom_wallpaper
+from macifylinux.components import kde_hello
+from macifylinux.components import kde_plasma_chili
+from macifylinux.components import mcmojave_cursors
+from macifylinux.components import mcmojave_kde
+from macifylinux.components import os_catalina_icons
+from macifylinux.components import sf_fonts
+
 from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
 
-logger = logging.getLogger("macifylinux.modules.lookandfeel.configure")
+logger = logging.getLogger("macifylinux.modules.lookandfeel")
+
+components = [
+    custom_wallpaper,
+    mcmojave_cursors,
+    mcmojave_kde,
+    os_catalina_icons,
+    sf_fonts,
+    kde_plasma_chili,
+    kde_hello,
+]
 
 
-def configure(*args, **kwargs):
-    options = kwargs.get("options", {})
-    style = options.get("style", "light")
+def install(*args, **kwargs):
+    for component in components:
+        component.install(*args, **kwargs)
+    configure()
 
+
+def upgrade(*args, **kwargs):
+    for component in components:
+        component.upgrade(*args, **kwargs)
+
+
+def remove(*args, **kwargs):
+    for component in components:
+        component.remove(*args, **kwargs)
+
+
+def configure(style="light"):
     # https://userbase.kde.org/KDE_Connect/Tutorials/Useful_commands#Change_look_and_feel
     if style == "light":
         theme = "McMojave-light"
         plasma_theme = "hellolight"
         color_scheme = "HelloLight"
-        #color_scheme = "McMojaveLight"
+        # color_scheme = "McMojaveLight"
     elif style == "dark":
         # todo. not tested/working.
         theme = "McMojave"
         plasma_theme = "hellodark"
         color_scheme = "HelloDark"
-        #color_scheme = "McMojave"
+        # color_scheme = "McMojave"
 
     # run the lookandfeeltool
     cmd = "lookandfeeltool -a 'com.github.vinceliuice.{}'".format(theme)
@@ -106,7 +137,12 @@ def configure(*args, **kwargs):
     # plasma theme
     # hellolight
     u.kwriteconfig(
-        {"key": "name", "value": plasma_theme, "group": "Theme", "file": "~/.config/plasmarc",}
+        {
+            "key": "name",
+            "value": plasma_theme,
+            "group": "Theme",
+            "file": "~/.config/plasmarc",
+        }
     )
 
     # Dolphin
@@ -148,7 +184,7 @@ def configure(*args, **kwargs):
         "$BACKGROUND_IMAGE", G["DEFAULT_WALLPAPER"]
     )
 
-    default_wallpaper = G["WALLPAPER_DIR"] / G["DEFAULT_WALLPAPER"]
+    default_wallpaper = G["WALLPAPERS_DIR"] / G["DEFAULT_WALLPAPER"]
 
     # Create theme.user.conf (points to wallpaper) and move it to theme directory. Doing it weird like this because sudo is required.
     tmp_file = tempfile.NamedTemporaryFile("w", delete=False)
@@ -240,17 +276,6 @@ def configure(*args, **kwargs):
             "value": "org.kde.breeze.desktop",
             "group": "KSplash",
             "file": "~/.config/ksplashrc",
-        }
-    )
-
-    # Configure wallpaper of lockscreen
-    wallpaper = G["WALLPAPER_DIR"] / Path("kym-ellis-RPT3AjdXlZc-unsplash.jpg")
-    u.kwriteconfig(
-        {
-            "key": "Image",
-            "value": "file://{}".format(wallpaper),
-            "group": ["Greeter", "Wallpaper", "org.kde.image", "General"],
-            "file": "~/.config/kscreenlockerrc",
         }
     )
 
