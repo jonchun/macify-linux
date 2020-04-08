@@ -10,7 +10,7 @@ Please feel free to open issues with comments/suggestions.
 - Must be relatively easy for users new to Linux to start using. This is why an Ubuntu-based distro was chosen.
 - Must be easy for developers used to macOS to start using in this setup. They should have their workflow impacted minimally in terms of the available hotkeys, software, etc.
 
-** WARNING: ** This utility is currently pre-alpha. It is absolutely not ready for a full release. However, it should still run fine for testing, especially if you're just spinning up a VM to check it out.
+**WARNING:** This utility is currently pre-alpha. It is absolutely not ready for a full release. However, it should still run fine for testing, especially if you're just spinning up a VM to check it out.
 
 ## Installation
 First, you need to be on a fresh install of KDE Neon
