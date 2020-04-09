@@ -28,6 +28,7 @@ apt_requirements = [
     "libkf5xmlgui-dev",
     "libqt5x11extras5-dev",
     "libsm-dev",
+    "libunity-dev",
     "libxcb-util-dev",
     "libxcb-util0-dev",
     "qtdeclarative5-dev",

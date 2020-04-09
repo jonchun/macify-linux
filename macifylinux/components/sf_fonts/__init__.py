@@ -67,6 +67,7 @@ def install(*args, **kwargs):
     u.git_clone(repo_url, G["SOURCES_DIR"])
     # run install.sh
     u.bash_action(action="install", file=__file__, name=component_name)
+    config()
 
 
 def upgrade(*args, **kwargs):

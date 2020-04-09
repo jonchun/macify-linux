@@ -80,7 +80,7 @@ def run():
     # modules.append((m.lookandfeel, [], {"style": "light"}))
     modules.append(m.lookandfeel)
     # spotlight should be installed after lookandfeel because it needs access to the installed icons
-    modules.append(m.spotlight)
+    # modules.append(m.spotlight)
     modules.append(m.plasmoids)
     # dockandpanel should be installed AFTER plasmoids because latte-dock depends on the installed plasmoids.
     modules.append(m.dockandpanel)
