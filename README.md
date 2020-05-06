@@ -39,7 +39,7 @@ Spotlight search alternative (Albert):
 ![macify-linux-5.png](https://raw.githubusercontent.com/Jonchun/macify-linux/master/images/macify-linux-5.png)
 
 ## Notes
-This is definitely a "rough draft" of the script! PLEASE DO NOT USE IT IN ANYTHING OTHER THAN A VM!
+This is definitely a "rough draft" of the script! PLEASE DO NOT USE IT IN ANYTHING OTHER THAN A VM! (Unless you're willing to spend time troubleshooting/backtracking if things go wrong)
 
 ## TODO
 - Make the installer interactive so you can choose light/dark and more
