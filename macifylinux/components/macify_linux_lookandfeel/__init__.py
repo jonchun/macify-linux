@@ -9,7 +9,7 @@ component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = []
-
+build_requirements = []
 light_laf = u.get_template("lookandfeel/com.github.jonchun.macify-linux-light")
 dark_laf = u.get_template("lookandfeel/com.github.jonchun.macify-linux-dark")
 

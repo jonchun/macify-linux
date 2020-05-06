@@ -29,6 +29,7 @@ def configure_logging():
 
 
 def install_prerequisites():
+    u.apt_update()
     u.apt_install(
         ["build-essential", "git", "software-properties-common"],
         "General Dependencies",
@@ -76,12 +77,12 @@ def run():
 
     modules = []
     # install Kinto(hotkeys module) first because it requires user interaction.
-    modules.append(m.hotkeys)
+    ## modules.append(m.hotkeys)
     # modules.append((m.lookandfeel, [], {"style": "light"}))
-    modules.append(m.lookandfeel)
+    ##modules.append(m.lookandfeel)
     # spotlight should be installed after lookandfeel because it needs access to the installed icons
     # modules.append(m.spotlight)
-    modules.append(m.plasmoids)
+    ## modules.append(m.plasmoids)
     # dockandpanel should be installed AFTER plasmoids because latte-dock depends on the installed plasmoids.
     modules.append(m.dockandpanel)
 
@@ -95,8 +96,10 @@ def run():
         if not pretty_name:
             pretty_name = module.__name__
         logger.info("Installing module: %s", pretty_name)
+        module_build_reqs = u.get_module_build_requirements(module)
         module_reqs = u.get_module_requirements(module)
         logger.debug("%s", module_reqs)
+        u.apt_install(module_build_reqs, "{} build requirements".format(pretty_name))
         u.apt_install(module_reqs, "{} requirements".format(pretty_name))
         module.install(*args, **kwargs)
 

@@ -9,7 +9,8 @@ import macifylinux.utils as u
 component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
-apt_requirements = [
+apt_requirements = []
+build_requirements = [
     "build-essential",
     "cmake",
     "extra-cmake-modules",
@@ -43,11 +44,18 @@ repo_name = Path(repo_url).stem
 
 
 def install(*args, **kwargs):
-    u.git_clone(repo_url, G["SOURCES_DIR"])
-    # run install.sh
-    u.bash_action(
-        action="install", file=__file__, name=component_name, stderr_level=logging.DEBUG
-    )
+    from_source = kwargs.get("from_source", False)
+    if from_source:
+        u.git_clone(repo_url, G["SOURCES_DIR"])
+        # run install.sh
+        u.bash_action(
+            action="install",
+            file=__file__,
+            name=component_name,
+            stderr_level=logging.DEBUG,
+        )
+    else:
+        u.apt_install(["latte-dock"])
 
     # Start and stop latte once after installing in order to generate the default configs.
     start_latte()
@@ -79,7 +87,6 @@ def install(*args, **kwargs):
         }
     )
     start_latte()
-
 
 def upgrade(*args, **kwargs):
     install(*args, **kwargs)

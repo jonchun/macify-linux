@@ -10,6 +10,7 @@ component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = ["xbindkeys", "xdotool", "ibus"]
+build_requirements = []
 repo_url = "https://github.com/rbreaves/kinto.git"
 repo_name = Path(repo_url).stem
 

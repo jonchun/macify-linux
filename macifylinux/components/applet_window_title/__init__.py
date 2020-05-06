@@ -9,6 +9,7 @@ component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = []
+build_requirements = []
 repo_url = "https://github.com/psifidotos/applet-window-title.git"
 repo_name = Path(repo_url).stem
 

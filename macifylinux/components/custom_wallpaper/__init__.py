@@ -6,6 +6,7 @@ from macifylinux.globals import GLOBALS as G
 import macifylinux.utils as u
 
 apt_requirements = ["curl"]
+build_requirements = []
 component_name = "custom_wallpaper"
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 

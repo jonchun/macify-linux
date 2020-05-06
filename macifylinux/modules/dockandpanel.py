@@ -1,4 +1,4 @@
-"""Spotlight Module"""
+"""Dock & Panel Module"""
 from macifylinux.components import latte_dock
 
 components = [latte_dock]

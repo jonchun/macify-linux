@@ -8,7 +8,8 @@ import macifylinux.utils as u
 component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
-apt_requirements = [
+apt_requirements = []
+build_requirements = [
     "cmake",
     "libmuparser-dev",
     "libqt5charts5-dev",

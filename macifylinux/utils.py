@@ -35,6 +35,15 @@ def apt_install(package_names, display_name=None):
         logger.debug("Package List: %s", packages, exc_info=True)
 
 
+def apt_update():
+    logger.info("Updating apt repositories.")
+    cmd = "sudo apt-get update"
+    try:
+        run_shell(cmd, stderr_level=logging.DEBUG)
+    except subprocess.CalledProcessError:
+        logger.error("Unable to apt-get update.")
+
+
 def change_desktop_wallpaper(wallpaper_file):
     with get_template("changeWallpaper.js").open() as f:
         wallpaper_script = f.read()
@@ -147,6 +156,20 @@ def bash_action(
             run_shell(" && ".join(commands), **log_levels)
     else:
         logger.debug("No `%s.sh` found for component: %s.", action, name)
+
+
+def get_module_build_requirements(module):
+    module_build_req = []
+    components = module.components
+    for component in components:
+        try:
+            component_build_req = component.build_requirements
+            module_build_req.extend(component_build_req)
+        except AttributeError:
+            # If component doesn't have build_requirements, assume no requirements.
+            continue
+    # just get rid of duplicates by turning into a set and then back to a list
+    return list(set(module_build_req))
 
 
 def get_module_requirements(module):

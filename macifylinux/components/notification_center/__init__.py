@@ -9,7 +9,7 @@ component_name = Path(__file__).parent.name
 logger = logging.getLogger("macifylinux.components.{}".format(component_name))
 
 apt_requirements = []
-
+build_requirements = []
 
 def install(*args, **kwargs):
     # currently, notification center just consists of tweaking a few default values for the built in notifications plasmoid.
