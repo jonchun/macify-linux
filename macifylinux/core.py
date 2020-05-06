@@ -77,12 +77,12 @@ def run():
 
     modules = []
     # install Kinto(hotkeys module) first because it requires user interaction.
-    ## modules.append(m.hotkeys)
+    modules.append(m.hotkeys)
     # modules.append((m.lookandfeel, [], {"style": "light"}))
-    ##modules.append(m.lookandfeel)
+    modules.append(m.lookandfeel)
     # spotlight should be installed after lookandfeel because it needs access to the installed icons
     # modules.append(m.spotlight)
-    ## modules.append(m.plasmoids)
+    modules.append(m.plasmoids)
     # dockandpanel should be installed AFTER plasmoids because latte-dock depends on the installed plasmoids.
     modules.append(m.dockandpanel)
 
